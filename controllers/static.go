@@ -3,17 +3,23 @@ package controllers
 import (
 	"html/template"
 	"net/http"
-
-	"github.com/anoopadavis/lenslocked/views"
 )
 
-func StaticHandler(tpl views.Template) http.HandlerFunc {
+type Static struct {
+	Template Template
+}
+
+func (static Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	static.Template.Execute(w, nil)
+}
+
+func StaticHandler(tpl Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tpl.Execute(w, nil)
 	}
 }
 
-func FAQ(tpl views.Template) http.HandlerFunc {
+func FAQ(tpl Template) http.HandlerFunc {
 	questions := []struct {
 		Question string
 		Answer   template.HTML
@@ -29,6 +35,10 @@ func FAQ(tpl views.Template) http.HandlerFunc {
 		{
 			Question: "How do I contact support?",
 			Answer:   `Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a>`,
+		},
+		{
+			Question: "Where is your office?",
+			Answer:   "Our entire team is remote!",
 		},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
